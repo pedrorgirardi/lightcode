@@ -1,7 +1,7 @@
 {
     "name": "lightcode",
     "displayName": "LightCode",
-    "description": "Clojure & ClojureScript",
+    "description": "Clojure & ClojureScript IDE",
     "version": "0.0.1",
     "publisher": "pedrorgirardi",
     "engines": {
