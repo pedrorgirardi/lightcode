@@ -28,7 +28,7 @@
         "test": "node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "shadow-cljs": "^2.3.12",
+        "shadow-cljs": "^2.3.16",
         "vscode": "^1.1.16"
     }
 }
