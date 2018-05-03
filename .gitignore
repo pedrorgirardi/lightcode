@@ -3,3 +3,4 @@ node_modules
 *.vsix
 .shadow-cljs/
 extension.js
+.nrepl-port
