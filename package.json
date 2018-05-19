@@ -31,5 +31,10 @@
     "devDependencies": {
         "shadow-cljs": "^2.3.16",
         "vscode": "^1.1.16"
+    },
+    "dependencies": {
+        "bencoder": "0.0.5",
+        "buffer": "^5.1.0",
+        "net": "^1.0.2"
     }
 }
