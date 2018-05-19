@@ -41,6 +41,8 @@
              :out  out}]
     
     (cmd-setup context sys #'cmd/welcome)
+    (cmd-setup context sys #'cmd/connect)
+    (cmd-setup context sys #'cmd/disconnect)
     
     (out/append-line out "Light Code is active.")))
 

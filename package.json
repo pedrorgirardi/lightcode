@@ -20,6 +20,16 @@
                 "title": "Welcome",
                 "category": "Light Code",
                 "command": "lightcode.welcome"
+            },
+            {
+                "title": "Connect",
+                "category": "Light Code",
+                "command": "lightcode.connect"
+            },
+            {
+                "title": "Disconnect",
+                "category": "Light Code",
+                "command": "lightcode.disconnect"
             }
         ]
     },

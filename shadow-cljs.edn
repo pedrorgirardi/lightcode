@@ -1,4 +1,5 @@
-{:dependencies [[datascript "0.16.5"]]
+{:dependencies [[datascript "0.16.5"]
+                [kitchen-async "0.1.0-SNAPSHOT"]]
 
  :source-paths ["src"]
 
