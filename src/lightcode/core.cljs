@@ -1,6 +1,7 @@
 (ns lightcode.core
   (:require 
    ["vscode" :as vscode]
+   [datascript.core :as d]
    [lightcode.cmd :as cmd]))
 
 
@@ -30,7 +31,9 @@
   (-> (.-languages vscode)
       (.setLanguageConfiguration "clojure" (ClojureLanguageConfiguration.)))
   
-  (cmd-setup context {} #'cmd/welcome)
+  (let [conn (d/create-conn {})
+        ctx  {:conn conn}]
+   (cmd-setup context ctx #'cmd/welcome))
   
   (js/console.log "Light Code is active."))
 

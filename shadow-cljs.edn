@@ -1,4 +1,4 @@
-{:dependencies []
+{:dependencies [[datascript "0.16.5"]]
 
  :source-paths ["src"]
 
