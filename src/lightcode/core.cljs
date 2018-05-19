@@ -2,7 +2,8 @@
   (:require 
    ["vscode" :as vscode]
    [datascript.core :as d]
-   [lightcode.cmd :as cmd]))
+   [lightcode.cmd :as cmd]
+   [lightcode.out :as out]))
 
 
 (defn ClojureLanguageConfiguration []
@@ -12,9 +13,9 @@
                                                 :decreaseIndentPattern nil})))
 
 
-(defn- register-command [ctx cmd]
+(defn- register-command [sys cmd]
   (-> (.-commands vscode)
-      (.registerCommand (-> cmd meta :cmd) #(cmd ctx))))
+      (.registerCommand (-> cmd meta :cmd) #(cmd sys))))
                  
                  
 (defn- register-disposable [^js context ^js disposable]
@@ -22,8 +23,8 @@
       (.push disposable)))
 
                  
-(defn- cmd-setup [^js context ctx cmd]
-  (->> (register-command ctx cmd)
+(defn- cmd-setup [^js context sys cmd]
+  (->> (register-command sys cmd)
        (register-disposable context)))
                  
 
@@ -32,10 +33,16 @@
       (.setLanguageConfiguration "clojure" (ClojureLanguageConfiguration.)))
   
   (let [conn (d/create-conn {})
-        ctx  {:conn conn}]
-   (cmd-setup context ctx #'cmd/welcome))
-  
-  (js/console.log "Light Code is active."))
+        
+        ^js out (-> (.-window vscode)
+                    (.createOutputChannel "Light Code"))
+        
+        sys {:conn conn
+             :out  out}]
+    
+    (cmd-setup context sys #'cmd/welcome)
+    
+    (out/append-line out "Light Code is active.")))
 
 
 (defn deactivate []
