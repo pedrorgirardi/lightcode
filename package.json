@@ -31,6 +31,16 @@
                 "title": "Disconnect",
                 "category": "Light Code",
                 "command": "lightcode.disconnect"
+            },
+            {
+                "title": "Session",
+                "category": "Light Code",
+                "command": "lightcode.session"
+            },
+            {
+                "title": "History",
+                "category": "Light Code",
+                "command": "lightcode.history"
             }
         ]
     },
