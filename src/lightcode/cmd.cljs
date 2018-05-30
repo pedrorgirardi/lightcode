@@ -1,55 +1,37 @@
 (ns lightcode.cmd
   (:require
    ["vscode" :as vscode]
+   ["nrepl-client" :as nrepl-client]
 
-   [kitchen-async.promise :as p]
-   [datascript.core :as d]
+   [cljs-node-io.core :as io]
+   [cljs-node-io.fs :as fs]
 
    [lightcode.nrepl :as nrepl]
    [lightcode.out :as out]
    [lightcode.gui :as gui]))
 
 
-(defn ^{:cmd "lightcode.welcome"} welcome [{:keys [conn]}]
-  nil)
+(defn slurp-port []
+  (let [path (str vscode/workspace.rootPath "/.nrepl-port")]
+    (when (fs/file? path)
+      (io/slurp path))))
 
 
-(defn ^{:cmd "lightcode.switchOn"} switch-on [{:keys [conn]}]
-  (p/let [host (gui/show-input-box {:placeHolder "nREPL Server Address"
-                                    :ignoreFocusOut true
-                                    :value "localhost"})
+(defn ^{:cmd "lightcode.switchOn"} switch-on [*sys]
+  (let [socket (.connect nrepl-client #js {:host "localhost" :port (slurp-port)})]
+    (doto socket
+      (.once "connect" (fn []
+                         (js/console.log "Switch on")))
 
-          port (gui/show-input-box {:placeHolder "nREPL Server Port"
-                                    :ignoreFocusOut true})]
+      (.once "end" (fn []
+                     (js/console.log "Switch off")))
 
-    (p/then (p/all [host port])
-            (fn [[host port]]
-              ;; TODO
-              (when (and host port)
-                (let [^js socket (nrepl/connect {:host host
-                                                 :port port
-                                                 :on-connect (fn []
-                                                               (d/transact! conn [{:db/id 0
-                                                                                   :conn/connected? true
-                                                                                   :conn/connecting? false}])
+      (.on "error" (fn [error]
+                     (js/console.log "Error" error))))
 
-                                                               (gui/show-information-message (str "Connected - nrepl://" host ":" port)))
-                                                 :on-end (fn []
-                                                           (d/transact! conn [{:db/id 0
-                                                                               :conn/connected? false
-                                                                               :conn/connecting? false}])
-
-                                                           (gui/show-information-message  (str "Disconnected - nrepl://" host ":" port)))})]
-
-                  (d/transact! conn [{:db/id 0
-                                      :conn/host host
-                                      :conn/port port
-                                      :conn/connected? false
-                                      :conn/connecting? true
-                                      :conn/socket socket}])))))))
+    (swap! *sys assoc :socket socket)))
 
 
-(defn ^{:cmd "lightcode.switchOff"} switch-off [{:keys [conn]}]
-  (let [^js socket (d/q '[:find ?s . :where [0 :conn/socket ?s]] @conn)]
-    (when socket
-      (.end socket))))
+(defn ^{:cmd "lightcode.switchOff"} switch-off [*sys]
+  (when-let [socket (get @*sys :socket)]
+    (.end socket)))
