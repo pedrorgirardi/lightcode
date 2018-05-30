@@ -26,7 +26,7 @@
                          (.clone (get @*sys :socket) (fn [err messages]
                                                        (when-not err
                                                          (let [[{:keys [new-session]}] (js->clj messages :keywordize-keys true)]
-                                                           (swap! *sys assoc :nrepl.session/clj new-session)))))))
+                                                           (swap! *sys assoc :lc.session/clj new-session)))))))
 
       (.once "end" (fn []
                      (js/console.log "Switch off")))
@@ -39,5 +39,9 @@
 
 (defn ^{:cmd "lightcode.switchOff"} switch-off [*sys]
   (when-let [socket (get @*sys :socket)]
-    (.end socket)
+    (if-let [session (get @*sys :lc.session/clj)]
+      (.close socket session (fn [_ _]
+                               (swap! *sys dissoc :lc.session/clj)
+                               (.end socket)))
+      (.end socket))
     (swap! *sys dissoc :socket)))
