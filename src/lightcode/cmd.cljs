@@ -21,7 +21,12 @@
   (let [socket (.connect nrepl-client #js {:host "localhost" :port (nrepl-port)})]
     (doto socket
       (.once "connect" (fn []
-                         (js/console.log "Switch on")))
+                         (js/console.log "Switch on")
+
+                         (.clone (get @*sys :socket) (fn [err messages]
+                                                       (when-not err
+                                                         (let [[{:keys [new-session]}] (js->clj messages :keywordize-keys true)]
+                                                           (swap! *sys assoc :nrepl.session/clj new-session)))))))
 
       (.once "end" (fn []
                      (js/console.log "Switch off")))
@@ -34,4 +39,5 @@
 
 (defn ^{:cmd "lightcode.switchOff"} switch-off [*sys]
   (when-let [socket (get @*sys :socket)]
-    (.end socket)))
+    (.end socket)
+    (swap! *sys dissoc :socket)))
