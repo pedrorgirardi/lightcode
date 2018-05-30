@@ -11,14 +11,14 @@
    [lightcode.gui :as gui]))
 
 
-(defn slurp-port []
+(defn nrepl-port []
   (let [path (str vscode/workspace.rootPath "/.nrepl-port")]
     (when (fs/file? path)
       (io/slurp path))))
 
 
 (defn ^{:cmd "lightcode.switchOn"} switch-on [*sys]
-  (let [socket (.connect nrepl-client #js {:host "localhost" :port (slurp-port)})]
+  (let [socket (.connect nrepl-client #js {:host "localhost" :port (nrepl-port)})]
     (doto socket
       (.once "connect" (fn []
                          (js/console.log "Switch on")))
