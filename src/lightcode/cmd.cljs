@@ -14,7 +14,7 @@
   nil)
 
 
-(defn ^{:cmd "lightcode.connect"} connect [{:keys [conn]}]
+(defn ^{:cmd "lightcode.switchOn"} switch-on [{:keys [conn]}]
   (p/let [host (gui/show-input-box {:placeHolder "nREPL Server Address"
                                     :ignoreFocusOut true
                                     :value "localhost"})
@@ -32,13 +32,13 @@
                                                                (d/transact! conn [{:db/id 0
                                                                                    :conn/connected? true
                                                                                    :conn/connecting? false}])
-                                                               
+
                                                                (gui/show-information-message (str "Connected - nrepl://" host ":" port)))
                                                  :on-end (fn []
                                                            (d/transact! conn [{:db/id 0
                                                                                :conn/connected? false
                                                                                :conn/connecting? false}])
-                                                           
+
                                                            (gui/show-information-message  (str "Disconnected - nrepl://" host ":" port)))})]
 
                   (d/transact! conn [{:db/id 0
@@ -49,7 +49,7 @@
                                       :conn/socket socket}])))))))
 
 
-(defn ^{:cmd "lightcode.disconnect"} disconnect [{:keys [conn]}]
+(defn ^{:cmd "lightcode.switchOff"} switch-off [{:keys [conn]}]
   (let [^js socket (d/q '[:find ?s . :where [0 :conn/socket ?s]] @conn)]
     (when socket
       (.end socket))))

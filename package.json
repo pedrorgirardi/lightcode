@@ -1,7 +1,7 @@
 {
     "name": "lightcode",
     "displayName": "Light Code",
-    "description": "REPL integration for Clojure & ClojureScript",
+    "description": "Smart completions, code navigation and refactoring for Clojure",
     "version": "0.0.1",
     "publisher": "pedrorgirardi",
     "engines": {
@@ -12,40 +12,28 @@
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:clojure"
+        "onLanguage:clojure",
+        "onCommand:lightcode.switchOn",
+        "onCommand:lightcode.switchOff"
     ],
     "main": "./extension",
     "contributes": {
         "commands": [
             {
-                "title": "Welcome",
+                "title": "Switch on",
                 "category": "Light Code",
-                "command": "lightcode.welcome"
+                "command": "lightcode.switchOn"
             },
             {
-                "title": "Connect",
+                "title": "Switch off",
                 "category": "Light Code",
-                "command": "lightcode.connect"
-            },
-            {
-                "title": "Disconnect",
-                "category": "Light Code",
-                "command": "lightcode.disconnect"
-            },
-            {
-                "title": "Session",
-                "category": "Light Code",
-                "command": "lightcode.session"
-            },
-            {
-                "title": "History",
-                "category": "Light Code",
-                "command": "lightcode.history"
+                "command": "lightcode.switchOff"
             }
         ]
     },
     "scripts": {
         "watch": "npx shadow-cljs watch :extension",
+        "release": "npx shadow-cljs release :extension",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "node ./node_modules/vscode/bin/test"
     },
