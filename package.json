@@ -1,13 +1,14 @@
 {
     "name": "lightcode",
-    "displayName": "LightCode",
-    "description": "Clojure & ClojureScript IDE",
+    "displayName": "Light Code",
+    "description": "REPL integration for Clojure & ClojureScript",
     "version": "0.0.1",
     "publisher": "pedrorgirardi",
     "engines": {
         "vscode": "^1.22.0"
     },
     "categories": [
+        "Programming Languages",
         "Other"
     ],
     "activationEvents": [
