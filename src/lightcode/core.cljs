@@ -6,16 +6,12 @@
    [lightcode.out :as out]))
 
 
-(defn ClojureLanguageConfiguration []
-  (this-as this
-           (set! (.-wordPattern this) #"[^\[\]\(\)\{\};\s\"\\]+")
-           (set! (.-indentationRules this) #js {:increaseIndentPattern #"[\[\(\{]"
-                                                :decreaseIndentPattern nil})))
+(def *sys
+  (atom {}))
 
 
-(defn- register-command [sys cmd]
-  (-> (.-commands vscode)
-      (.registerCommand (-> cmd meta :cmd) #(cmd sys))))
+(defn- register-command [*sys cmd]
+  (vscode/commands.registerCommand (-> cmd meta :cmd) #(cmd *sys)))
 
 
 (defn- register-disposable [^js context ^js disposable]
@@ -23,27 +19,23 @@
       (.push disposable)))
 
 
-(defn- cmd-setup [^js context sys cmd]
-  (->> (register-command sys cmd)
+(defn- reg-cmd [^js context *sys cmd]
+  (->> (register-command *sys cmd)
        (register-disposable context)))
 
 
 (defn activate [^js context]
-  (-> (.-languages vscode)
-      (.setLanguageConfiguration "clojure" (ClojureLanguageConfiguration.)))
+  (let [clojure-language-configuration {:wordPattern #"[^\[\]\(\)\{\};\s\"\\]+"
+                                        :indentationRules {:increaseIndentPattern #"[\[\(\{]"
+                                                           :decreaseIndentPattern nil}}]
 
-  (let [conn (d/create-conn {})
+    (vscode/languages.setLanguageConfiguration "clojure"  (clj->js clojure-language-configuration)))
 
-        ^js out (-> (.-window vscode)
-                    (.createOutputChannel "Light Code"))
 
-        sys {:conn conn
-             :out  out}]
+  (reg-cmd context *sys #'cmd/switch-on)
+  (reg-cmd context *sys #'cmd/switch-off)
 
-    (cmd-setup context sys #'cmd/switch-on)
-    (cmd-setup context sys #'cmd/switch-off)
-
-    (out/append-line out "Light Code is active.")))
+  (js/console.log "Light Code is active."))
 
 
 (defn deactivate []
