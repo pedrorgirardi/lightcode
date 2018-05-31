@@ -17,7 +17,7 @@
   (let [socket (.connect nrepl-client #js {:host "localhost" :port (nrepl-port)})]
     (doto socket
       (.once "connect" (fn []
-                         (js/console.log "Switch on")
+                         (js/console.log "Light Code is on")
 
                          (.clone (get @*sys :socket) (fn [err messages]
                                                        (when-not err
@@ -25,10 +25,10 @@
                                                            (swap! *sys assoc :lc.session/clj new-session)))))))
 
       (.once "end" (fn []
-                     (js/console.log "Switch off")))
+                     (js/console.log "Light Code is off")))
 
       (.on "error" (fn [error]
-                     (js/console.log "Error" error))))
+                     (js/console.log "Light Code socket error" error))))
 
     (swap! *sys assoc :socket socket)))
 
