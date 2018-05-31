@@ -1,5 +1,4 @@
-{:dependencies [[org.clojure/tools.reader "1.2.1"]
-                [kitchen-async "0.1.0-SNAPSHOT"]
+{:dependencies [[kitchen-async "0.1.0-SNAPSHOT"]
                 [cljs-node-io "0.5.0"]]
 
  :source-paths ["src"]
