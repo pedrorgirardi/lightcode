@@ -1,9 +1,20 @@
 (ns lightcode.core
   (:require
    ["vscode" :as vscode]
-   ["nrepl-client" :as nrepl-client]
+   ["net" :as net]
+   ["axios" :as axios]
 
-   [lightcode.lib :as lib]))
+   [lightcode.lib :as lib]
+   [lightcode.op :as op]
+   [kitchen-async.promise :as p]
+   [clojure.string :as str]))
+
+;; ------------------------------------------------
+;; STATE
+;; ------------------------------------------------
+
+(def *sys
+  (atom {}))
 
 
 ;; ------------------------------------------------
@@ -24,74 +35,97 @@
        (register-disposable context)))
 
 
-
 ;; ------------------------------------------------
 ;; COMMANDS
 ;; ------------------------------------------------
 
-(defn ^{:cmd "lightcode.switchOn"} cmd-switch-on [*sys]
-  (let [socket (.connect nrepl-client #js {:host "localhost" :port (lib/nrepl-port!)})]
-    (doto socket
-      (.once "connect" (fn []
-                         (js/console.log "Light Code is on")
+(defn ^{:cmd "lightcode.loadFile"} cmd-load-file [*sys]
+  (when-let [document (lib/active-clojure-document)]
+    (op/load-file! (:lc.document/content document)
+                   (:lc.document/src-path-relative-path document)
+                   (:lc.document/file-name document)))
 
-                         (.clone (get @*sys :socket) (fn [err messages]
-                                                       (when-not err
-                                                         (let [[{:keys [new-session]}] (js->clj messages :keywordize-keys true)]
-                                                           (swap! *sys assoc :lc.session/clj new-session)))))))
-
-      (.once "end" (fn []
-                     (js/console.log "Light Code is off")))
-
-      (.on "error" (fn [error]
-                     (js/console.log "Light Code socket error" error))))
-
-    (swap! *sys assoc :socket socket)))
-
-
-(defn ^{:cmd "lightcode.switchOff"} cmd-switch-off [*sys]
-  (when-let [socket (get @*sys :socket)]
-    (if-let [session (get @*sys :lc.session/clj)]
-      (.close socket session (fn [_ _]
-                               (swap! *sys dissoc :lc.session/clj)
-                               (.end socket)))
-      (.end socket))
-    (swap! *sys dissoc :socket)))
-
-
-
-;; ------------------------------------------------
-;; CONFIGURATION
-;; ------------------------------------------------
-
-(def ClojureLanguageConfiguration
-  (clj->js {:wordPattern #"[^\[\]\(\)\{\};\s\"\\]+"
-            :indentationRules {:increaseIndentPattern #"[\[\(\{]"
-                               :decreaseIndentPattern nil}}))
-
+  nil)
 
 
 ;; ------------------------------------------------
 ;; PROVIDERS
 ;; ------------------------------------------------
 
+(deftype ClojureDefinitionProvider [*sys]
+  Object
+  (provideDefinition [_ document position _]
+    (let [word-at-position (lib/word-at-position document position)
+          document-ns      (lib/read-document-ns-name document)]
+      (-> (op/info! document-ns word-at-position)
+          (p/then
+           (fn [response]
+             (js/console.log "[PROVIDE-DEFINITION]" response)
 
+             (let [response (js->clj response :keywordize-keys true)
+                   file     (get-in response [:data :file])
+                   line     (get-in response [:data :line])
+                   column   (get-in response [:data :column])
+                   uri      (when file
+                              (vscode/Uri.parse file))
+                   position (when (and line column)
+                              (vscode/Position. (dec line) column))]
+               (when (and uri position)
+                 (vscode/Location. uri position)))))
+          (p/catch*
+           (fn [error]
+             (js/console.error "[PROVIDE-DEFINITION]" error)))))))
+
+
+(deftype ClojureHoverProvider [*sys]
+  Object
+  (provideHover [_ document position _]
+    (let [word-at-position (lib/word-at-position document position)
+          document-ns      (lib/read-document-ns-name document)]
+      (-> (op/info! document-ns word-at-position)
+          (p/then
+           (fn [response]
+             (js/console.log "[PROVIDE-HOVER]" response)
+
+             (let [response (js->clj response :keywordize-keys true)
+                   namespace  (get-in response [:data :ns] "")
+                   name       (get-in response [:data :name] "")
+                   args       (get-in response [:data :arglists-str] "")
+                   doc        (get-in response [:data :doc] "")
+                   markdown   (doto (vscode/MarkdownString. (str namespace (when-not (str/blank? namespace) "/") "**" name "**"))
+                                (.appendText "\n\n")
+                                (.appendText doc)
+                                (.appendText "\n\n")
+                                (.appendCodeblock args "clojure"))]
+
+               (when-not (str/blank? name)
+                 (vscode/Hover. markdown)))))
+
+          (p/catch*
+           (fn [error]
+             (js/console.error "[PROVIDE-HOVER]" error)))))))
 
 
 ;; ------------------------------------------------
-;; EXTENSION STATE
-;; ------------------------------------------------
 
-(def *sys
-  (atom {}))
 
+(def clojure-document-selector
+  #js {:scheme   "file"
+       :language "clojure"})
+
+
+(def clojure-language-configuration
+  #js {:wordPattern #"[^\[\]\(\)\{\};\s\"\\]+"})
 
 
 (defn activate [^js context]
-  (vscode/languages.setLanguageConfiguration "clojure"  ClojureLanguageConfiguration)
+  (vscode/languages.setLanguageConfiguration "clojure" clojure-language-configuration)
 
-  (reg-cmd context *sys #'cmd-switch-on)
-  (reg-cmd context *sys #'cmd-switch-off)
+  (register-disposable context (vscode/languages.registerDefinitionProvider clojure-document-selector (ClojureDefinitionProvider. *sys)))
+
+  (register-disposable context (vscode/languages.registerHoverProvider clojure-document-selector (ClojureHoverProvider. *sys)))
+
+  (reg-cmd context *sys #'cmd-load-file)
 
   (js/console.log "Light Code is active."))
 

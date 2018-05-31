@@ -22,26 +22,15 @@
     "icon": "images/icon.png",
     "activationEvents": [
         "onLanguage:clojure",
-        "onCommand:lightcode.switchOn",
-        "onCommand:lightcode.switchOff"
+        "onCommand:lightcode.loadFile"
     ],
     "main": "./extension",
     "contributes": {
-        "configurationDefaults": {
-            "[clojure]": {
-                "editor.wordSeparators": "\t ()\"':,;~@#$%^&{}[]`"
-            }
-        },
         "commands": [
             {
-                "title": "Switch on",
+                "title": "Load file",
                 "category": "Light Code",
-                "command": "lightcode.switchOn"
-            },
-            {
-                "title": "Switch off",
-                "category": "Light Code",
-                "command": "lightcode.switchOff"
+                "command": "lightcode.loadFile"
             }
         ]
     },
@@ -57,6 +46,9 @@
         "vscode": "^1.1.16"
     },
     "dependencies": {
-        "nrepl-client": "^0.2.3"
+        "axios": "^0.18.0",
+        "bencode": "^2.0.0",
+        "buffer": "^5.0.7",
+        "net": "1.0.2"
     }
 }
