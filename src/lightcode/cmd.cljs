@@ -4,11 +4,7 @@
    ["nrepl-client" :as nrepl-client]
 
    [cljs-node-io.core :as io]
-   [cljs-node-io.fs :as fs]
-
-   [lightcode.nrepl :as nrepl]
-   [lightcode.out :as out]
-   [lightcode.gui :as gui]))
+   [cljs-node-io.fs :as fs]))
 
 
 (defn nrepl-port []
