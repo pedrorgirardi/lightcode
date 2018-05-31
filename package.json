@@ -17,6 +17,34 @@
         "onCommand:lightcode.switchOff"
     ],
     "main": "./extension",
+    "configurationDefaults": {
+        "[clojure]": {
+            "editor.wordSeparators": "\t ()\"':,;~@#$%^&{}[]`",
+            "editor.tokenColorCustomizations": {
+                "[Default Dark+]": {
+                    "textMateRules": [
+                        {
+                            "scope": [
+                                "constant.keyword.clojure"
+                            ],
+                            "settings": {
+                                "foreground": "#9cdcfe"
+                            }
+                        },
+                        {
+                            "scope": [
+                                "punctuation.section.expression.begin.clojure",
+                                "punctuation.section.expression.end.trailing.clojure"
+                            ],
+                            "settings": {
+                                "foreground": "#999"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    },
     "contributes": {
         "commands": [
             {
