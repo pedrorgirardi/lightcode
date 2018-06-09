@@ -58,9 +58,25 @@
 
 
 (defn ns-vars!
-  "Sends an 'ns-vars' message.
+  "Sends a 'ns-vars' message.
   
   `ns` Namespace name, e.g. lightcode.op
   `symbol` Symbol, e.g. send!"
   [ns]
   (send! (->ns-vars ns)))
+
+
+(defn ->ns-vars-with-meta
+  "`ns` Namespace name, e.g. lightcode.op"
+  [ns]
+  {:op "ns-vars-with-meta"
+   :ns ns})
+
+
+(defn ns-vars-with-meta!
+  "Sends a 'ns-vars-with-meta' message.
+  
+  `ns` Namespace name, e.g. lightcode.op
+  `symbol` Symbol, e.g. send!"
+  [ns]
+  (send! (->ns-vars-with-meta ns)))

@@ -107,21 +107,17 @@
            (fn [response]
              (js/console.log "[PROVIDE-DOCUMENT-SYMBOLS]" response)
 
-            ;  (let [response (js->clj response :keywordize-keys true)
-            ;        namespace  (get-in response [:data :ns] "")
-            ;        name       (get-in response [:data :name] "")
-            ;        args       (get-in response [:data :arglists-str] "")
-            ;        doc        (get-in response [:data :doc] "")
-            ;        markdown   (doto (vscode/MarkdownString. (str namespace (when-not (str/blank? namespace) "/") "**" name "**"))
-            ;                     (.appendText "\n\n")
-            ;                     (.appendText doc)
-            ;                     (.appendText "\n\n")
-            ;                     (.appendCodeblock args "clojure"))]
+             (let [response   (js->clj response :keywordize-keys true)
+                   ns-vars    (get-in response [:data :ns-vars])
+                   symbols    (clj->js
+                               (map
+                                (fn [var-name]
+                                  (vscode/SymbolInformation. var-name vscode/SymbolKind.Object "" nil))
+                                ns-vars))]
 
-            ;    (when-not (str/blank? name)
-            ;      (vscode/Hover. markdown)))
+               (js/console.log "[SYMBOLS]" symbols)
 
-             nil))
+               symbols)))
 
           (p/catch*
            (fn [error]
