@@ -8,3 +8,7 @@ vsc-extension-quickstart.md
 .shadow-cljs/**
 src/**
 shadow-cljs.edn
+.idea/**
+demo/**
+server/**
+pom.xml
