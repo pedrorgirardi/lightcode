@@ -85,12 +85,13 @@
            (fn [response]
              (js/console.log "[PROVIDE-HOVER]" response)
 
-             (let [response (js->clj response :keywordize-keys true)
+             (let [response   (js->clj response :keywordize-keys true)
                    namespace  (get-in response [:data :ns] "")
                    name       (get-in response [:data :name] "")
-                   args       (get-in response [:data :arglists-str] "")
+                   name       (str namespace (when-not (str/blank? namespace) "/") "**" name "**")
                    doc        (get-in response [:data :doc] "")
-                   markdown   (doto (vscode/MarkdownString. (str namespace (when-not (str/blank? namespace) "/") "**" name "**"))
+                   args       (get-in response [:data :arglists-str] "")
+                   markdown   (doto (vscode/MarkdownString. name)
                                 (.appendText "\n\n")
                                 (.appendText doc)
                                 (.appendText "\n\n")
