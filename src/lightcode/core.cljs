@@ -10,19 +10,11 @@
    [clojure.string :as str]))
 
 ;; ------------------------------------------------
-;; STATE
-;; ------------------------------------------------
-
-(def *sys
-  (atom {}))
-
-
-;; ------------------------------------------------
 ;; HELPERS
 ;; ------------------------------------------------
 
-(defn- register-command [*sys cmd]
-  (vscode/commands.registerCommand (-> cmd meta :cmd) #(cmd *sys)))
+(defn- register-command [cmd]
+  (vscode/commands.registerCommand (-> cmd meta :cmd) cmd))
 
 
 (defn- register-disposable [^js context ^js disposable]
@@ -30,8 +22,8 @@
       (.push disposable)))
 
 
-(defn- reg-cmd [^js context *sys cmd]
-  (->> (register-command *sys cmd)
+(defn- reg-cmd [^js context cmd]
+  (->> (register-command cmd)
        (register-disposable context)))
 
 
@@ -39,7 +31,7 @@
 ;; COMMANDS
 ;; ------------------------------------------------
 
-(defn ^{:cmd "lightcode.loadFile"} cmd-load-file [*sys]
+(defn ^{:cmd "lightcode.loadFile"} cmd-load-file []
   (when-let [document (lib/active-clojure-document)]
     (op/load-file! (:lc.document/content document)
                    (:lc.document/src-path-relative-path document)
@@ -52,7 +44,7 @@
 ;; PROVIDERS
 ;; ------------------------------------------------
 
-(deftype ClojureDefinitionProvider [*sys]
+(deftype ClojureDefinitionProvider []
   Object
   (provideDefinition [_ document position _]
     (let [word-at-position (lib/word-at-position document position)
@@ -77,7 +69,7 @@
              (js/console.error "[PROVIDE-DEFINITION]" error)))))))
 
 
-(deftype ClojureHoverProvider [*sys]
+(deftype ClojureHoverProvider []
   Object
   (provideHover [_ document position _]
     (let [word-at-position (lib/word-at-position document position)
@@ -121,11 +113,11 @@
 (defn activate [^js context]
   (vscode/languages.setLanguageConfiguration "clojure" clojure-language-configuration)
 
-  (register-disposable context (vscode/languages.registerDefinitionProvider clojure-document-selector (ClojureDefinitionProvider. *sys)))
+  (register-disposable context (vscode/languages.registerDefinitionProvider clojure-document-selector (ClojureDefinitionProvider.)))
 
-  (register-disposable context (vscode/languages.registerHoverProvider clojure-document-selector (ClojureHoverProvider. *sys)))
+  (register-disposable context (vscode/languages.registerHoverProvider clojure-document-selector (ClojureHoverProvider.)))
 
-  (reg-cmd context *sys #'cmd-load-file)
+  (reg-cmd context #'cmd-load-file)
 
   (js/console.log "Light Code is active."))
 
