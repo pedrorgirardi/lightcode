@@ -40,6 +40,12 @@
   nil)
 
 
+(defn ^{:cmd "lightcode.loadNamespaces"} cmd-load-namespaces []
+  (op/ns-load-all!)
+
+  nil)
+
+
 ;; ------------------------------------------------
 ;; PROVIDERS
 ;; ------------------------------------------------
@@ -144,6 +150,7 @@
   (register-disposable context (vscode/languages.registerDocumentSymbolProvider clojure-document-selector (ClojureDocumentSymbolProvider.)))
 
   (reg-cmd context #'cmd-load-file)
+  (reg-cmd context #'cmd-load-namespaces)
 
   (js/console.log "Light Code is active."))
 

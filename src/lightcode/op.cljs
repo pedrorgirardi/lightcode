@@ -80,3 +80,13 @@
   `symbol` Symbol, e.g. send!"
   [ns]
   (send! (->ns-vars-with-meta ns)))
+
+
+(defn ->ns-load-all []
+  {:op "ns-load-all"})
+
+
+(defn ns-load-all!
+  "Sends a 'ns-load-all' message."
+  []
+  (send! (->ns-load-all)))
