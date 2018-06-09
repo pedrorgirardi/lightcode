@@ -31,6 +31,23 @@
   [ns symbol]
   (send! (->info ns symbol)))
 
+(defn ->eldoc
+  "`ns` Namespace name, e.g. lightcode.op
+   `symbol` Symbol, e.g. send!"
+  [ns symbol]
+  {:op     "eldoc"
+   :ns     ns
+   :symbol symbol})
+
+
+(defn eldoc!
+  "Sends an 'eldoc' message.
+  
+  `ns` Namespace name, e.g. lightcode.op
+  `symbol` Symbol, e.g. send!"
+  [ns symbol]
+  (send! (->eldoc ns symbol)))
+
 
 (defn ->load-file
   "`content` Full contents of a file of code
