@@ -98,6 +98,36 @@
              (js/console.error "[PROVIDE-HOVER]" error)))))))
 
 
+(deftype ClojureDocumentSymbolProvider []
+  Object
+  (provideDocumentSymbols [_ document _]
+    (let [ns (lib/read-document-ns-name document)]
+      (-> (op/ns-vars! ns)
+          (p/then
+           (fn [response]
+             (js/console.log "[PROVIDE-DOCUMENT-SYMBOLS]" response)
+
+            ;  (let [response (js->clj response :keywordize-keys true)
+            ;        namespace  (get-in response [:data :ns] "")
+            ;        name       (get-in response [:data :name] "")
+            ;        args       (get-in response [:data :arglists-str] "")
+            ;        doc        (get-in response [:data :doc] "")
+            ;        markdown   (doto (vscode/MarkdownString. (str namespace (when-not (str/blank? namespace) "/") "**" name "**"))
+            ;                     (.appendText "\n\n")
+            ;                     (.appendText doc)
+            ;                     (.appendText "\n\n")
+            ;                     (.appendCodeblock args "clojure"))]
+
+            ;    (when-not (str/blank? name)
+            ;      (vscode/Hover. markdown)))
+
+             nil))
+
+          (p/catch*
+           (fn [error]
+             (js/console.error "[PROVIDE-DOCUMENT-SYMBOLS]" error)))))))
+
+
 ;; ------------------------------------------------
 
 
@@ -114,8 +144,8 @@
   (vscode/languages.setLanguageConfiguration "clojure" clojure-language-configuration)
 
   (register-disposable context (vscode/languages.registerDefinitionProvider clojure-document-selector (ClojureDefinitionProvider.)))
-
   (register-disposable context (vscode/languages.registerHoverProvider clojure-document-selector (ClojureHoverProvider.)))
+  (register-disposable context (vscode/languages.registerDocumentSymbolProvider clojure-document-selector (ClojureDocumentSymbolProvider.)))
 
   (reg-cmd context #'cmd-load-file)
 

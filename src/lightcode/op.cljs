@@ -24,10 +24,10 @@
 
 
 (defn info!
-  "Sends an info message.
+  "Sends an 'info' message.
   
-   `ns` Namespace name, e.g. lightcode.op
-   `symbol` Symbol, e.g. send!"
+  `ns` Namespace name, e.g. lightcode.op
+  `symbol` Symbol, e.g. send!"
   [ns symbol]
   (send! (->info ns symbol)))
 
@@ -48,3 +48,19 @@
    `name` Name of source file, e.g. io.clj"
   [content path name]
   (send! (->load-file content path name)))
+
+
+(defn ->ns-vars
+  "`ns` Namespace name, e.g. lightcode.op"
+  [ns]
+  {:op "ns-vars"
+   :ns ns})
+
+
+(defn ns-vars!
+  "Sends an 'ns-vars' message.
+  
+  `ns` Namespace name, e.g. lightcode.op
+  `symbol` Symbol, e.g. send!"
+  [ns]
+  (send! (->ns-vars ns)))
