@@ -4,3 +4,6 @@ node_modules
 .shadow-cljs/
 extension.js
 .nrepl-port
+*.DS_Store
+pom.xml
+.idea/

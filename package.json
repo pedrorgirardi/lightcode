@@ -1,35 +1,54 @@
 {
     "name": "lightcode",
-    "displayName": "LightCode",
-    "description": "Clojure & ClojureScript IDE",
-    "version": "0.0.1",
+    "displayName": "Light Code",
+    "description": "Smart completions, code navigation and refactoring for Clojure",
+    "version": "0.0.2",
     "publisher": "pedrorgirardi",
+    "author": {
+        "name": "Pedro Girardi",
+        "email": "pedro.rogerio.girardi@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://bitbucket.org/pedrogirardi/lightcode.git"
+    },
     "engines": {
         "vscode": "^1.22.0"
     },
     "categories": [
+        "Programming Languages",
         "Other"
     ],
+    "icon": "images/icon.png",
     "activationEvents": [
-        "onCommand:lightcode.welcome"
+        "onLanguage:clojure",
+        "onCommand:lightcode.loadFile"
     ],
     "main": "./extension",
     "contributes": {
         "commands": [
             {
-                "title": "Welcome",
+                "title": "Load file",
                 "category": "Light Code",
-                "command": "lightcode.welcome"
+                "command": "lightcode.loadFile"
             }
         ]
     },
     "scripts": {
         "watch": "npx shadow-cljs watch :extension",
+        "release": "npx shadow-cljs release :extension",
+        "vscode:prepublish": "npm run release",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "shadow-cljs": "^2.3.16",
+        "shadow-cljs": "^2.3.30",
         "vscode": "^1.1.16"
+    },
+    "dependencies": {
+        "axios": "^0.18.0",
+        "bencode": "^2.0.0",
+        "buffer": "^5.0.7",
+        "net": "1.0.2"
     }
 }

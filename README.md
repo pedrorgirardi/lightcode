@@ -1,65 +1,63 @@
-# lightcode README
+# Light Code
 
-This is the README for your extension "lightcode". After writing up a brief description, we recommend including the following sections.
+Smart completions, code navigation and refactoring for Clojure.
 
-## Features
+Light Code is about adding 'smartness' to your code, but more is required if we want to have an enjoyable editing experience for Clojure & ClojureScript.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+I'm thinking about two kind of experiences:
+- Code editing;
+- Live programming; 
 
-For example if there is an image subfolder under your extension project workspace:
 
-\!\[feature X\]\(images/feature-x.png\)
+I should extract my theme customizations into a proper Theme Extension. Light Code itself shouldn't do anything about theme customization.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
-## Requirements
+This is what Light Code should **NOT DO**:
+- Theme customizations.
+- Format your code. This should be done by a formatter extension like `cljfmt`.
+- Structural editing. This should also be done by extensions like `Calva Paredit` or `Parinfer`.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+This is what Light Code should **DO**:
+- Provide a LanguageConfiguration and `editor.wordSeparators`
 
-## Extension Settings
+  >The language configuration interfaces defines the contract between extensions and various editor features, like automatic bracket insertion, automatic indentation etc.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+- Provide a DefinitionProvider
 
-For example:
+  >The definition provider interface defines the contract between extensions and the go to definition and peek definition features.
 
-This extension contributes the following settings:
+- Provide a DocumentSymbolProvider
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+  >The document symbol provider interface defines the contract between extensions and the go to symbol-feature.
 
-## Known Issues
+- Provide a ReferenceProvider
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+  >The reference provider interface defines the contract between extensions and the find references-feature.
 
-## Release Notes
+- Provide a HoverProvider
 
-Users appreciate release notes as you update your extension.
+  >The hover provider interface defines the contract between extensions and the hover-feature.
 
-### 1.0.0
+- Provide a SignatureHelpProvider
 
-Initial release of ...
+  >The signature help provider interface defines the contract between extensions and the parameter hints-feature.
 
-### 1.0.1
+- Provide a RenameProvider
 
-Fixed issue #.
+  >The rename provider interface defines the contract between extensions and the rename-feature.
 
-### 1.1.0
+- Provide a WorkspaceSymbolProvider
 
-Added features X, Y, and Z.
+  >The workspace symbol provider interface defines the contract between extensions and the symbol search-feature.
 
------------------------------------------------------------------------------------------------------------
 
-## Working with Markdown
+TODO
 
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+  1. LanguageConfiguration and `editor.wordSeparators` ✅
+  1. DefinitionProvider
+  1. DocumentSymbolProvider
+  1. ReferenceProvider
+  1. HoverProvider
+  1. SignatureHelpProvider
+  1. RenameProvider
+  1. WorkspaceSymbolProvider
