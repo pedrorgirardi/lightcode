@@ -55,9 +55,9 @@ TODO
 
   1. LanguageConfiguration and `editor.wordSeparators` ✅
   1. DefinitionProvider
-  1. DocumentSymbolProvider
+  1. DocumentSymbolProvider ✅
   1. ReferenceProvider
-  1. HoverProvider
+  1. HoverProvider ✅
   1. SignatureHelpProvider
   1. RenameProvider
   1. WorkspaceSymbolProvider
