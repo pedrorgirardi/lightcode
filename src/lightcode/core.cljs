@@ -108,28 +108,27 @@
 (deftype ClojureDocumentSymbolProvider []
   Object
   (provideDocumentSymbols [_ document _]
-    (let [ns (lib/read-document-ns-name document)]
+    (let [ns      (lib/read-document-ns-name document)
+          message (clj->js {:remote  {:port (lib/nrepl-port!)}
+                            :provide {:provider "DocumentSymbolProvider"
+                                      :ns ns}})]
+      (-> (.post axios "http://localhost:8383/tooling" message)
+          (p/then
+           (fn [response]
+             (js/console.log "[PROVIDE-DOCUMENT-SYMBOLS]" response)
 
-      (let [message (clj->js {:remote {:port (lib/nrepl-port!)}
-                              :provide {:provider "DocumentSymbolProvider"
-                                        :ns ns}})]
-        (-> (.post axios "http://localhost:8383/tooling" message)
-            (p/then
-             (fn [response]
-
-               (js/console.log "[PROVIDE-DOCUMENT-SYMBOLS]" response)
-
-               (clj->js
-                (map
-                 (fn [{:keys [name column line file]}]
-                   (let [uri      (vscode/Uri.parse file)
-                         position (vscode/Position. (dec line) column)
-                         location (vscode/Location. uri position)]
-                     (vscode/SymbolInformation. name vscode/SymbolKind.Variable "" location)))
-                 (:data (js->clj response :keywordize-keys true))))))
-            (p/catch*
-             (fn [error]
-               (js/console.error "[PROVIDE-DOCUMENT-SYMBOLS]" error))))))))
+             (let [{:keys [data]} (js->clj response :keywordize-keys true)
+                   infos          (map
+                                   (fn [{:keys [name column line file]}]
+                                     (let [uri      (vscode/Uri.parse file)
+                                           position (vscode/Position. (dec line) column)
+                                           location (vscode/Location. uri position)]
+                                       (vscode/SymbolInformation. name vscode/SymbolKind.Variable "" location)))
+                                   data)]
+               (clj->js infos))))
+          (p/catch*
+           (fn [error]
+             (js/console.error "[PROVIDE-DOCUMENT-SYMBOLS]" error)))))))
 
 
 ;; ------------------------------------------------
