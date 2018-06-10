@@ -86,6 +86,8 @@
              (js/console.log "[PROVIDE-HOVER]" response)
 
              (let [response   (js->clj response :keywordize-keys true)
+                   statuses   (get-in response [:data :status])
+                   has-info?  (not (contains? (set statuses) "no-info"))
                    namespace  (get-in response [:data :ns] "")
                    name       (get-in response [:data :name] "")
                    name       (str namespace (when-not (str/blank? namespace) "/") "**" name "**")
@@ -96,10 +98,8 @@
                                 (.appendText doc)
                                 (.appendText "\n\n")
                                 (.appendCodeblock args "clojure"))]
-
-               (when-not (str/blank? name)
+               (when has-info?
                  (vscode/Hover. markdown)))))
-
           (p/catch*
            (fn [error]
              (js/console.error "[PROVIDE-HOVER]" error)))))))
