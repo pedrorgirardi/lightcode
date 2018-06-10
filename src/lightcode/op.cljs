@@ -24,12 +24,29 @@
 
 
 (defn info!
-  "Sends an info message.
+  "Sends an 'info' message.
   
-   `ns` Namespace name, e.g. lightcode.op
-   `symbol` Symbol, e.g. send!"
+  `ns` Namespace name, e.g. lightcode.op
+  `symbol` Symbol, e.g. send!"
   [ns symbol]
   (send! (->info ns symbol)))
+
+(defn ->eldoc
+  "`ns` Namespace name, e.g. lightcode.op
+   `symbol` Symbol, e.g. send!"
+  [ns symbol]
+  {:op     "eldoc"
+   :ns     ns
+   :symbol symbol})
+
+
+(defn eldoc!
+  "Sends an 'eldoc' message.
+  
+  `ns` Namespace name, e.g. lightcode.op
+  `symbol` Symbol, e.g. send!"
+  [ns symbol]
+  (send! (->eldoc ns symbol)))
 
 
 (defn ->load-file
@@ -48,3 +65,45 @@
    `name` Name of source file, e.g. io.clj"
   [content path name]
   (send! (->load-file content path name)))
+
+
+(defn ->ns-vars
+  "`ns` Namespace name, e.g. lightcode.op"
+  [ns]
+  {:op "ns-vars"
+   :ns ns})
+
+
+(defn ns-vars!
+  "Sends a 'ns-vars' message.
+  
+  `ns` Namespace name, e.g. lightcode.op
+  `symbol` Symbol, e.g. send!"
+  [ns]
+  (send! (->ns-vars ns)))
+
+
+(defn ->ns-vars-with-meta
+  "`ns` Namespace name, e.g. lightcode.op"
+  [ns]
+  {:op "ns-vars-with-meta"
+   :ns ns})
+
+
+(defn ns-vars-with-meta!
+  "Sends a 'ns-vars-with-meta' message.
+  
+  `ns` Namespace name, e.g. lightcode.op
+  `symbol` Symbol, e.g. send!"
+  [ns]
+  (send! (->ns-vars-with-meta ns)))
+
+
+(defn ->ns-load-all []
+  {:op "ns-load-all"})
+
+
+(defn ns-load-all!
+  "Sends a 'ns-load-all' message."
+  []
+  (send! (->ns-load-all)))

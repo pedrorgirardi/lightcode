@@ -40,6 +40,12 @@
   nil)
 
 
+(defn ^{:cmd "lightcode.loadNamespaces"} cmd-load-namespaces []
+  (op/ns-load-all!)
+
+  nil)
+
+
 ;; ------------------------------------------------
 ;; PROVIDERS
 ;; ------------------------------------------------
@@ -79,23 +85,58 @@
            (fn [response]
              (js/console.log "[PROVIDE-HOVER]" response)
 
-             (let [response (js->clj response :keywordize-keys true)
-                   namespace  (get-in response [:data :ns] "")
-                   name       (get-in response [:data :name] "")
-                   args       (get-in response [:data :arglists-str] "")
-                   doc        (get-in response [:data :doc] "")
-                   markdown   (doto (vscode/MarkdownString. (str namespace (when-not (str/blank? namespace) "/") "**" name "**"))
-                                (.appendText "\n\n")
-                                (.appendText doc)
-                                (.appendText "\n\n")
-                                (.appendCodeblock args "clojure"))]
-
-               (when-not (str/blank? name)
+             (let [response         (js->clj response :keywordize-keys true)
+                   statuses         (get-in response [:data :status])
+                   info?            (not (contains? (set statuses) "no-info"))
+                   namespace        (get-in response [:data :ns] "")
+                   namespace?       (not (str/blank? namespace))
+                   name             (get-in response [:data :name] "")
+                   name?            (not (str/blank? name))
+                   namespace-only?  (str/blank? name)
+                   name-only?       (str/blank? namespace)
+                   namespace-name?  (and name? namespace?)
+                   doc              (get-in response [:data :doc] "")
+                   args             (get-in response [:data :arglists-str] "")
+                   markdown         (doto (vscode/MarkdownString. (cond
+                                                                    namespace-name? (str namespace "/**" name "**")
+                                                                    namespace-only? (str "**" namespace "**")
+                                                                    name-only?      (str "**" name "**")
+                                                                    :else           ""))
+                                      (.appendText "\n\n")
+                                      (.appendText doc)
+                                      (.appendText "\n\n")
+                                      (.appendCodeblock args "clojure"))]
+               (when info?
                  (vscode/Hover. markdown)))))
-
           (p/catch*
            (fn [error]
              (js/console.error "[PROVIDE-HOVER]" error)))))))
+
+
+(deftype ClojureDocumentSymbolProvider []
+  Object
+  (provideDocumentSymbols [_ document _]
+    (let [ns      (lib/read-document-ns-name document)
+          message (clj->js {:remote   {:port (lib/nrepl-port!)}
+                            :provider "DocumentSymbolProvider"
+                            :ns       ns})]
+      (-> (.post axios "http://localhost:8383/tooling" message)
+          (p/then
+           (fn [response]
+             (js/console.log "[PROVIDE-DOCUMENT-SYMBOLS]" response)
+
+             (let [{:keys [data]} (js->clj response :keywordize-keys true)
+                   infos          (map
+                                   (fn [{:keys [name column line file]}]
+                                     (let [uri      (vscode/Uri.parse file)
+                                           position (vscode/Position. line column)
+                                           location (vscode/Location. uri position)]
+                                       (vscode/SymbolInformation. name vscode/SymbolKind.Variable "" location)))
+                                   data)]
+               (clj->js infos))))
+          (p/catch*
+           (fn [error]
+             (js/console.error "[PROVIDE-DOCUMENT-SYMBOLS]" error)))))))
 
 
 ;; ------------------------------------------------
@@ -114,10 +155,11 @@
   (vscode/languages.setLanguageConfiguration "clojure" clojure-language-configuration)
 
   (register-disposable context (vscode/languages.registerDefinitionProvider clojure-document-selector (ClojureDefinitionProvider.)))
-
   (register-disposable context (vscode/languages.registerHoverProvider clojure-document-selector (ClojureHoverProvider.)))
+  (register-disposable context (vscode/languages.registerDocumentSymbolProvider clojure-document-selector (ClojureDocumentSymbolProvider.)))
 
   (reg-cmd context #'cmd-load-file)
+  (reg-cmd context #'cmd-load-namespaces)
 
   (js/console.log "Light Code is active."))
 
