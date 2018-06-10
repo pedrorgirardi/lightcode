@@ -87,7 +87,7 @@
 
              (let [response         (js->clj response :keywordize-keys true)
                    statuses         (get-in response [:data :status])
-                   has-info?        (not (contains? (set statuses) "no-info"))
+                   info?            (not (contains? (set statuses) "no-info"))
                    namespace        (get-in response [:data :ns] "")
                    namespace?       (not (str/blank? namespace))
                    name             (get-in response [:data :name] "")
@@ -106,7 +106,7 @@
                                       (.appendText doc)
                                       (.appendText "\n\n")
                                       (.appendCodeblock args "clojure"))]
-               (when has-info?
+               (when info?
                  (vscode/Hover. markdown)))))
           (p/catch*
            (fn [error]
