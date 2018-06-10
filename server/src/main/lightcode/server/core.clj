@@ -26,7 +26,7 @@
                                                (nrepl/combine-responses)))]
          {:name   var-name
           :column column
-          :line   line
+          :line   (dec line)
           :file   file}))
      ns-vars)))
 

@@ -129,7 +129,7 @@
                    infos          (map
                                    (fn [{:keys [name column line file]}]
                                      (let [uri      (vscode/Uri.parse file)
-                                           position (vscode/Position. (dec line) column)
+                                           position (vscode/Position. line column)
                                            location (vscode/Location. uri position)]
                                        (vscode/SymbolInformation. name vscode/SymbolKind.Variable "" location)))
                                    data)]
