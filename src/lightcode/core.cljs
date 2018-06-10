@@ -85,19 +85,27 @@
            (fn [response]
              (js/console.log "[PROVIDE-HOVER]" response)
 
-             (let [response   (js->clj response :keywordize-keys true)
-                   statuses   (get-in response [:data :status])
-                   has-info?  (not (contains? (set statuses) "no-info"))
-                   namespace  (get-in response [:data :ns] "")
-                   name       (get-in response [:data :name] "")
-                   name       (str namespace (when-not (str/blank? namespace) "/") "**" name "**")
-                   doc        (get-in response [:data :doc] "")
-                   args       (get-in response [:data :arglists-str] "")
-                   markdown   (doto (vscode/MarkdownString. name)
-                                (.appendText "\n\n")
-                                (.appendText doc)
-                                (.appendText "\n\n")
-                                (.appendCodeblock args "clojure"))]
+             (let [response         (js->clj response :keywordize-keys true)
+                   statuses         (get-in response [:data :status])
+                   has-info?        (not (contains? (set statuses) "no-info"))
+                   namespace        (get-in response [:data :ns] "")
+                   namespace?       (not (str/blank? namespace))
+                   name             (get-in response [:data :name] "")
+                   name?            (not (str/blank? name))
+                   namespace-only?  (str/blank? name)
+                   name-only?       (str/blank? namespace)
+                   namespace-name?  (and name? namespace?)
+                   doc              (get-in response [:data :doc] "")
+                   args             (get-in response [:data :arglists-str] "")
+                   markdown         (doto (vscode/MarkdownString. (cond
+                                                                    namespace-name? (str namespace "/**" name "**")
+                                                                    namespace-only? (str "**" namespace "**")
+                                                                    name-only?      (str "**" name "**")
+                                                                    :else           ""))
+                                      (.appendText "\n\n")
+                                      (.appendText doc)
+                                      (.appendText "\n\n")
+                                      (.appendCodeblock args "clojure"))]
                (when has-info?
                  (vscode/Hover. markdown)))))
           (p/catch*
