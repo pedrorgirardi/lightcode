@@ -117,9 +117,9 @@
   Object
   (provideDocumentSymbols [_ document _]
     (let [ns      (lib/read-document-ns-name document)
-          message (clj->js {:remote  {:port (lib/nrepl-port!)}
-                            :provide {:provider "DocumentSymbolProvider"
-                                      :ns ns}})]
+          message (clj->js {:remote   {:port (lib/nrepl-port!)}
+                            :provider "DocumentSymbolProvider"
+                            :ns       ns})]
       (-> (.post axios "http://localhost:8383/tooling" message)
           (p/then
            (fn [response]

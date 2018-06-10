@@ -5,23 +5,23 @@
    [clojure.string :as str]
    [clojure.tools.nrepl :as nrepl]))
 
-(defmulti editor-provider
-  (fn [m]
-    (get-in m [:provide :provider])))
+(defmulti editor-provider :provider)
 
 
-(defmethod editor-provider "DocumentSymbolProvider" [{:keys [provide] :as m}]
-  (let [{:keys [ns-vars]} (with-open [conn (nrepl/connect :port (Integer. (get-in m [:remote :port])))]
+(defmethod editor-provider "DocumentSymbolProvider" [{:keys [ns] :as m}]
+  (let [port (Integer. (get-in m [:remote :port]))
+
+        {:keys [ns-vars]} (with-open [conn (nrepl/connect :port port)]
                             (-> (nrepl/client conn  1000)
                                 (nrepl/message {:op "ns-vars"
-                                                :ns (:ns provide)})
+                                                :ns ns})
                                 (nrepl/combine-responses)))]
     (map
      (fn [var-name]
-       (let  [{:keys [column line file]} (with-open [conn (nrepl/connect :port (Integer. (get-in m [:remote :port])))]
+       (let  [{:keys [column line file]} (with-open [conn (nrepl/connect :port port)]
                                            (-> (nrepl/client conn 1000)
                                                (nrepl/message {:op "info"
-                                                               :ns (:ns provide)
+                                                               :ns ns
                                                                :symbol var-name})
                                                (nrepl/combine-responses)))]
          {:name   var-name
