@@ -109,26 +109,27 @@
   Object
   (provideDocumentSymbols [_ document _]
     (let [ns (lib/read-document-ns-name document)]
-      (-> (op/ns-vars! ns)
-          (p/then
-           (fn [response]
-             (js/console.log "[PROVIDE-DOCUMENT-SYMBOLS]" response)
 
-             (let [response   (js->clj response :keywordize-keys true)
-                   ns-vars    (get-in response [:data :ns-vars])
-                   symbols    (clj->js
-                               (map
-                                (fn [var-name]
-                                  (vscode/SymbolInformation. var-name vscode/SymbolKind.Object "" nil))
-                                ns-vars))]
+      (let [message (clj->js {:remote {:port (lib/nrepl-port!)}
+                              :provide {:provider "DocumentSymbolProvider"
+                                        :ns ns}})]
+        (-> (.post axios "http://localhost:8383/tooling" message)
+            (p/then
+             (fn [response]
 
-               (js/console.log "[SYMBOLS]" symbols)
+               (js/console.log "[PROVIDE-DOCUMENT-SYMBOLS]" response)
 
-               symbols)))
-
-          (p/catch*
-           (fn [error]
-             (js/console.error "[PROVIDE-DOCUMENT-SYMBOLS]" error)))))))
+               (clj->js
+                (map
+                 (fn [{:keys [name column line file]}]
+                   (let [uri      (vscode/Uri.parse file)
+                         position (vscode/Position. (dec line) column)
+                         location (vscode/Location. uri position)]
+                     (vscode/SymbolInformation. name vscode/SymbolKind.Variable "" location)))
+                 (:data (js->clj response :keywordize-keys true))))))
+            (p/catch*
+             (fn [error]
+               (js/console.error "[PROVIDE-DOCUMENT-SYMBOLS]" error))))))))
 
 
 ;; ------------------------------------------------
