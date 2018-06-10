@@ -6,6 +6,7 @@
 
    [lightcode.lib :as lib]
    [lightcode.op :as op]
+   [lightcode.config :as config]
    [kitchen-async.promise :as p]
    [clojure.string :as str]))
 
@@ -120,7 +121,7 @@
           message (clj->js {:remote   {:port (lib/nrepl-port!)}
                             :provider "DocumentSymbolProvider"
                             :ns       ns})]
-      (-> (.post axios "http://localhost:8383/tooling" message)
+      (-> (.post axios config/server-tooling-url message)
           (p/then
            (fn [response]
              (js/console.log "[PROVIDE-DOCUMENT-SYMBOLS]" response)

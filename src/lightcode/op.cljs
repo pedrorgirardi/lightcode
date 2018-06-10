@@ -3,15 +3,13 @@
    ["axios" :as axios]
 
    [kitchen-async.promise :as p]
+   [lightcode.config :as config]
    [lightcode.lib :as lib]))
-
-(def server-url
-  "http://localhost:8383/nrepl")
 
 
 (defn send! [message]
   (let [message (clj->js (assoc message :port (lib/nrepl-port!)))]
-    (.post axios server-url message)))
+    (.post axios config/server-nrepl-url message)))
 
 
 (defn ->info
