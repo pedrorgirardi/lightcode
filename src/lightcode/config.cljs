@@ -4,9 +4,9 @@
   "http://localhost:8383")
 
 
-(def server-nrepl-url
-  (str server-url "/nrepl"))
+(def repl-api-url
+  (str server-url "/repl"))
 
 
-(def server-tooling-url
-  (str server-url "/tooling"))
+(def language-api-url
+  (str server-url "/language"))

@@ -3,32 +3,10 @@
    [yada.yada :as yada]
    [integrant.core :as ig]
    [clojure.string :as str]
-   [clojure.tools.nrepl :as nrepl]))
+   [clojure.tools.logging :as log]
 
-(defmulti editor-provider :provider)
-
-
-(defmethod editor-provider "DocumentSymbolProvider" [{:keys [ns] :as m}]
-  (let [port (Integer. (get-in m [:remote :port]))
-
-        {:keys [ns-vars]} (with-open [conn (nrepl/connect :port port)]
-                            (-> (nrepl/client conn  1000)
-                                (nrepl/message {:op "ns-vars"
-                                                :ns ns})
-                                (nrepl/combine-responses)))]
-    (map
-     (fn [var-name]
-       (let  [{:keys [column line file]} (with-open [conn (nrepl/connect :port port)]
-                                           (-> (nrepl/client conn 1000)
-                                               (nrepl/message {:op "info"
-                                                               :ns ns
-                                                               :symbol var-name})
-                                               (nrepl/combine-responses)))]
-         {:name   var-name
-          :column column
-          :line   (dec line)
-          :file   file}))
-     ns-vars)))
+   [lightcode.server.language :as language]
+   [lightcode.server.repl :as repl]))
 
 
 (defmethod ig/init-key ::listener [_ _]
@@ -39,34 +17,21 @@
                           {:produces #{"text/html"}
                            :response "<span style='font-family:menlo'>Ligh Code server.</span>"}}})]
 
-                   ["nrepl" (yada/resource
-                             {:methods
-                              {:post
-                               {:consumes #{"application/json"}
-                                :produces #{"application/json"}
-                                :response (fn [{:keys [body]}]
-                                            (let [port    (:port body)
-                                                  message (dissoc body :port)]
+                   ["repl" (yada/resource
+                            {:methods
+                             {:post
+                              {:consumes #{"application/json"}
+                               :produces #{"application/json"}
+                               :response (fn [{:keys [body]}]
+                                           (repl/repl body))}}})]
 
-                                              (println "[MESSAGE]" message)
-
-                                              (when-not (str/blank? port)
-                                                (with-open [conn (nrepl/connect :port (Integer. port))]
-                                                  (-> (nrepl/client conn 1000)
-                                                      (nrepl/message message)
-                                                      (nrepl/combine-responses)
-                                                      doall)))))}}})]
-
-                   ["tooling" (yada/resource
-                               {:methods
-                                {:post
-                                 {:consumes #{"application/json"}
-                                  :produces #{"application/json"}
-                                  :response (fn [{:keys [body]}]
-                                              (println "[BODY]" body)
-
-                                              (when-not (str/blank? (get-in body [:remote :port]))
-                                                (editor-provider body)))}}})]]]
+                   ["language" (yada/resource
+                                {:methods
+                                 {:post
+                                  {:consumes #{"application/json"}
+                                   :produces #{"application/json"}
+                                   :response (fn [{:keys [body]}]
+                                               (or (language/provider body) {}))}}})]]]
                  {:port 8383}))
 
 

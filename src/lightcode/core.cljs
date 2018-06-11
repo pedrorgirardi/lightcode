@@ -4,8 +4,9 @@
    ["net" :as net]
    ["axios" :as axios]
 
-   [lightcode.lib :as lib]
+   [lightcode.editor :as editor]
    [lightcode.op :as op]
+   [lightcode.workspace :as workspace]
    [lightcode.config :as config]
    [kitchen-async.promise :as p]
    [clojure.string :as str]))
@@ -33,8 +34,9 @@
 ;; ------------------------------------------------
 
 (defn ^{:cmd "lightcode.loadFile"} cmd-load-file []
-  (when-let [document (lib/active-clojure-document)]
-    (op/load-file! (:lc.document/content document)
+  (when-let [document (editor/active-clojure-document)]
+    (op/load-file! (:lc.document/env document)
+                   (:lc.document/content document)
                    (:lc.document/src-path-relative-path document)
                    (:lc.document/file-name document)))
 
@@ -42,7 +44,8 @@
 
 
 (defn ^{:cmd "lightcode.loadNamespaces"} cmd-load-namespaces []
-  (op/ns-load-all!)
+  (when-let [document (editor/active-clojure-document)]
+    (op/ns-load-all! (editor/env document)))
 
   nil)
 
@@ -54,9 +57,10 @@
 (deftype ClojureDefinitionProvider []
   Object
   (provideDefinition [_ document position _]
-    (let [word-at-position (lib/word-at-position document position)
-          document-ns      (lib/read-document-ns-name document)]
-      (-> (op/info! document-ns word-at-position)
+    (let [word-at-position (editor/word-at-position document position)
+          document-ns      (editor/read-document-ns-name document)
+          env              (editor/env document)]
+      (-> (op/info! env document-ns word-at-position)
           (p/then
            (fn [response]
              (js/console.log "[PROVIDE-DEFINITION]" response)
@@ -79,9 +83,10 @@
 (deftype ClojureHoverProvider []
   Object
   (provideHover [_ document position _]
-    (let [word-at-position (lib/word-at-position document position)
-          document-ns      (lib/read-document-ns-name document)]
-      (-> (op/info! document-ns word-at-position)
+    (let [word-at-position (editor/word-at-position document position)
+          document-ns      (editor/read-document-ns-name document)
+          env              (editor/env document)]
+      (-> (op/info! env document-ns word-at-position)
           (p/then
            (fn [response]
              (js/console.log "[PROVIDE-HOVER]" response)
@@ -117,11 +122,16 @@
 (deftype ClojureDocumentSymbolProvider []
   Object
   (provideDocumentSymbols [_ document _]
-    (let [ns      (lib/read-document-ns-name document)
-          message (clj->js {:remote   {:port (lib/nrepl-port!)}
-                            :provider "DocumentSymbolProvider"
-                            :ns       ns})]
-      (-> (.post axios config/server-tooling-url message)
+    (let [message (clj->js {:provider   "DocumentSymbolProvider"
+                            :file       (.-fileName document)
+                            :text       (.getText document)
+                            :context    (merge
+                                         {:nrepl {:port (workspace/nrepl-port!)}
+                                          :env   (editor/document-language document)}
+
+                                         (workspace/cljs-repl-context!))})]
+
+      (-> (.post axios config/language-api-url message)
           (p/then
            (fn [response]
              (js/console.log "[PROVIDE-DOCUMENT-SYMBOLS]" response)
