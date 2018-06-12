@@ -3,6 +3,8 @@ All notable changes to the "lightcode" extension will be documented in this file
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.0.4]
+
 ## [0.0.3] - 2018-06-12
 ### Added
 - Document Symbol Provider.
