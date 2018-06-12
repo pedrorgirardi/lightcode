@@ -3,7 +3,10 @@ All notable changes to the "lightcode" extension will be documented in this file
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [0.0.3] - 2018-06-12
+### Added
+- Document Symbol Provider.
+- ClojureScript support - Fighweel and Shadow CLJS.
 
 ## [0.0.2]
 ### Added
