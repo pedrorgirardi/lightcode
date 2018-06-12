@@ -1,4 +1,4 @@
-(ns lightcode.lib
+(ns lightcode.editor
   (:require
    ["vscode" :as vscode]
 
@@ -49,7 +49,8 @@
       {:lc.document/object                    document
        :lc.document/content                   (.getText document)
        :lc.document/src-path-relative-path    (doc-src-path-relative-path document)
-       :lc.document/file-name                 (doc-file-name document)})))
+       :lc.document/file-name                 (doc-file-name document)
+       :lc.document/env                       (str/replace (doc-file-extension document) #"\." "")})))
 
 
 
@@ -61,5 +62,13 @@
 (defn nrepl-port! []
   (let [path (str vscode/workspace.rootPath "/.nrepl-port")]
     (when (fs/file? path)
-      (io/slurp path))))
+      (js/parseInt (io/slurp path)))))
+
+
+(defn document-language [document]
+  (str/replace (doc-file-extension document) #"\." ""))
+
+
+(defn env [document]
+  (str/replace (doc-file-extension document) #"\." ""))
 

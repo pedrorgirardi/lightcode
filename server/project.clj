@@ -4,16 +4,14 @@
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :main ^:skip-aot lightcode.server.core
-
-  :target-path "target/%s"
+  :source-paths ["src/main" "src/dev"]
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/tools.nrepl "0.2.13"]
                  [yada "1.2.13"]
                  [integrant "0.7.0-alpha2"]]
 
-  :profiles {:dev     {:dependencies [[cider/cider-nrepl "0.17.0"]
-                                      [integrant/repl "0.3.1"]]}
-
-             :uberjar {:aot :all}})
+  :profiles {:dev {:dependencies [[cider/cider-nrepl "0.17.0"]
+                                  [integrant/repl "0.3.1"]
+                                  [io.aviso/pretty "0.1.34"]
+                                  [com.bhauman/rebel-readline "0.1.1"]]}})

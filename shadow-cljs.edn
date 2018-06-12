@@ -6,6 +6,7 @@
 
  :builds
  {:extension
-  {:target :node-library
-   :exports {:activate lightcode.core/activate}
-   :output-to "extension.js"}}}
+  {:target            :node-library
+   :output-to         "extension.js"
+   :exports           {:activate lightcode.core/activate}
+   :compiler-options  {:optimizations :simple}}}}

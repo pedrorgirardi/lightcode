@@ -2,7 +2,7 @@
     "name": "lightcode",
     "displayName": "Light Code",
     "description": "Smart completions, code navigation and refactoring for Clojure",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "publisher": "pedrorgirardi",
     "author": {
         "name": "Pedro Girardi",
@@ -31,18 +31,25 @@
                 "title": "Load file",
                 "category": "Light Code",
                 "command": "lightcode.loadFile"
+            },
+            {
+                "title": "Load all namespaces",
+                "category": "Light Code",
+                "command": "lightcode.loadNamespaces"
             }
         ]
     },
     "scripts": {
+        "clean": "rm -rf .shadow-cljs",
         "watch": "npx shadow-cljs watch :extension",
+        "compile": "npx shadow-cljs compile :extension",
         "release": "npx shadow-cljs release :extension",
-        "vscode:prepublish": "npm run release",
+        "vscode:prepublish": "npm run clean & npm run release",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "shadow-cljs": "^2.3.30",
+        "shadow-cljs": "^2.4.0",
         "vscode": "^1.1.16"
     },
     "dependencies": {

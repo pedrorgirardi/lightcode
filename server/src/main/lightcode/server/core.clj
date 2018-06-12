@@ -2,7 +2,11 @@
   (:require
    [yada.yada :as yada]
    [integrant.core :as ig]
-   [clojure.tools.nrepl :as nrepl]))
+   [clojure.string :as str]
+   [clojure.tools.logging :as log]
+
+   [lightcode.server.language :as language]
+   [lightcode.server.repl :as repl]))
 
 
 (defmethod ig/init-key ::listener [_ _]
@@ -13,22 +17,21 @@
                           {:produces #{"text/html"}
                            :response "<span style='font-family:menlo'>Ligh Code server.</span>"}}})]
 
-                   ["nrepl" (yada/resource
-                             {:methods
-                              {:post
-                               {:consumes #{"application/json"}
-                                :produces #{"application/json"}
-                                :response (fn [{:keys [body]}]
-                                            (let [port    (Integer. (:port body))
-                                                  message (dissoc body :port)]
+                   ["repl" (yada/resource
+                            {:methods
+                             {:post
+                              {:consumes #{"application/json"}
+                               :produces #{"application/json"}
+                               :response (fn [{:keys [body]}]
+                                           (repl/repl body))}}})]
 
-                                              (println "[MESSAGE]" message)
-
-                                              (with-open [conn (nrepl/connect :port port)]
-                                                (-> (nrepl/client conn 1000)
-                                                    (nrepl/message message)
-                                                    (nrepl/combine-responses)
-                                                    doall))))}}})]]]
+                   ["language" (yada/resource
+                                {:methods
+                                 {:post
+                                  {:consumes #{"application/json"}
+                                   :produces #{"application/json"}
+                                   :response (fn [{:keys [body]}]
+                                               (or (language/provider body) {}))}}})]]]
                  {:port 8383}))
 
 
