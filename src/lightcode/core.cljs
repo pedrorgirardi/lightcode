@@ -1,6 +1,7 @@
 (ns lightcode.core
   (:require
    ["vscode" :as vscode]
+   ["vscode-languageclient" :as vscode-languageclient]
    ["net" :as net]
    ["axios" :as axios]
 
@@ -163,14 +164,28 @@
 
 
 (defn activate [^js context]
-  (vscode/languages.setLanguageConfiguration "clojure" clojure-language-configuration)
+  ; (vscode/languages.setLanguageConfiguration "clojure" clojure-language-configuration)
 
-  (register-disposable context (vscode/languages.registerDefinitionProvider clojure-document-selector (ClojureDefinitionProvider.)))
-  (register-disposable context (vscode/languages.registerHoverProvider clojure-document-selector (ClojureHoverProvider.)))
-  (register-disposable context (vscode/languages.registerDocumentSymbolProvider clojure-document-selector (ClojureDocumentSymbolProvider.)))
+  ; (register-disposable context (vscode/languages.registerDefinitionProvider clojure-document-selector (ClojureDefinitionProvider.)))
+  ; (register-disposable context (vscode/languages.registerHoverProvider clojure-document-selector (ClojureHoverProvider.)))
+  ; (register-disposable context (vscode/languages.registerDocumentSymbolProvider clojure-document-selector (ClojureDocumentSymbolProvider.)))
 
-  (reg-cmd context #'cmd-load-file)
-  (reg-cmd context #'cmd-load-namespaces)
+  ; (reg-cmd context #'cmd-load-file)
+  ; (reg-cmd context #'cmd-load-namespaces)
+
+  (let [server-options {:run   {:command "clojure-lsp"}
+                        :debug {:command "bash"
+                                :args    ["-c" "cd /Users/pedro/Developer/clojure-lsp && lein run"]}}
+
+        client-options {:documentSelector [{:scheme "file" :language "clojure"}]
+                        :synchronize      {:configurationSection "clojure-lsp"
+                                           :fileEvents           (vscode/workspace.createFileSystemWatcher "**/.clientrc")}}
+
+        language-client (vscode-languageclient/LanguageClient. "clojure-lsp" "Clojure Language Client" (clj->js server-options) (clj->js client-options))]
+
+    (.start language-client)
+
+    (register-disposable context language-client))
 
   (js/console.log "Light Code is active."))
 
