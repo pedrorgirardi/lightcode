@@ -46,15 +46,15 @@
 
 
 (defn activate [^js context]
-  (let [server-options {:run   {:command "clojure-lsp"}
+  (let [server-options {:run   {:command "lightcode"}
                         :debug {:command "bash"
-                                :args    ["-c" "cd /Users/pedro/Developer/clojure-lsp && lein run"]}}
+                                :args    ["-c" "cd /Users/pedro/Developer/lightcode.server && lein run"]}}
 
         client-options {:documentSelector [{:scheme "file" :language "clojure"}]
-                        :synchronize      {:configurationSection "clojure-lsp"
+                        :synchronize      {:configurationSection "lightcode"
                                            :fileEvents           (vscode/workspace.createFileSystemWatcher "**/.clientrc")}}
 
-        language-client (vscode-languageclient/LanguageClient. "clojure-lsp" "Clojure Language Client" (clj->js server-options) (clj->js client-options))]
+        language-client (vscode-languageclient/LanguageClient. "lightcode" "Light Code" (clj->js server-options) (clj->js client-options))]
 
     (.start language-client)
 
