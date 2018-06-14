@@ -1,7 +1,7 @@
 (ns lightcode.core
   (:require
-   ["vscode" :as vscode]
-   ["vscode-languageclient" :as vscode-languageclient]
+   [vscode :as vscode]
+   [vscode-languageclient :as vscode-languageclient]
 
    [lightcode.editor :as editor]
    [lightcode.op :as op]))
