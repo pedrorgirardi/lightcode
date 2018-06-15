@@ -7,3 +7,5 @@ extension.js
 *.DS_Store
 pom.xml
 .idea/
+.cpcache
+.lsp/

@@ -21,21 +21,15 @@
     ],
     "icon": "images/icon.png",
     "activationEvents": [
-        "onLanguage:clojure",
-        "onCommand:lightcode.loadFile"
+        "onLanguage:clojure"
     ],
     "main": "./extension",
     "contributes": {
         "commands": [
             {
-                "title": "Load file",
+                "title": "Send Selection to REPL",
                 "category": "Light Code",
-                "command": "lightcode.loadFile"
-            },
-            {
-                "title": "Load all namespaces",
-                "category": "Light Code",
-                "command": "lightcode.loadNamespaces"
+                "command": "lightcode.sendSelectionToREPL"
             }
         ]
     },
