@@ -43,14 +43,14 @@
         "test": "node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "shadow-cljs": "^2.4.2",
-        "vscode": "^1.1.16"
+        "shadow-cljs": "^2.4.2"
     },
     "dependencies": {
         "axios": "^0.18.0",
         "bencode": "^2.0.0",
         "buffer": "^5.0.7",
         "net": "1.0.2",
+        "vscode": "^1.1.18",
         "vscode-languageclient": "^4.2.1"
     }
 }
