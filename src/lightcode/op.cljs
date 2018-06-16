@@ -1,6 +1,6 @@
 (ns lightcode.op
   (:require
-   ["axios" :as axios]
+   [axios :as axios]
 
    [kitchen-async.promise :as p]
    [lightcode.config :as config]

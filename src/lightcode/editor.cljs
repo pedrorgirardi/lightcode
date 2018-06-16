@@ -1,6 +1,6 @@
 (ns lightcode.editor
   (:require
-   ["vscode" :as vscode]
+   [vscode :as vscode]
 
    [clojure.string :as str]
    [cljs.reader :as r]
@@ -21,8 +21,8 @@
   (r/read-string (.getText doc)))
 
 
-(defn doc-file-extension [doc]
-  (fs/ext (.-fileName doc)))
+(defn document-file-extension [^js document]
+  (fs/ext (.-fileName document)))
 
 
 (defn doc-file-name [doc]
@@ -34,7 +34,7 @@
   [doc]
   (let [[_ namespace-name] (doc-ns doc)
         rpath (str/replace (name namespace-name) #"\." "/")
-        ext (doc-file-extension doc)]
+        ext (document-file-extension doc)]
     (str rpath ext)))
 
 
@@ -50,7 +50,7 @@
        :lc.document/content                   (.getText document)
        :lc.document/src-path-relative-path    (doc-src-path-relative-path document)
        :lc.document/file-name                 (doc-file-name document)
-       :lc.document/env                       (str/replace (doc-file-extension document) #"\." "")})))
+       :lc.document/env                       (str/replace (document-file-extension document) #"\." "")})))
 
 
 
@@ -66,9 +66,9 @@
 
 
 (defn document-language [document]
-  (str/replace (doc-file-extension document) #"\." ""))
+  (str/replace (document-file-extension document) #"\." ""))
 
 
 (defn env [document]
-  (str/replace (doc-file-extension document) #"\." ""))
+  (str/replace (document-file-extension document) #"\." ""))
 
