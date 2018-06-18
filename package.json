@@ -30,6 +30,11 @@
                 "title": "Send Selection to REPL",
                 "category": "Light Code",
                 "command": "lightcode.sendSelectionToREPL"
+            },
+            {
+                "title": "New document",
+                "category": "Light Code",
+                "command": "lightcode.newDocument"
             }
         ]
     },

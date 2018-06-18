@@ -68,13 +68,17 @@
                                     :nrepl {:port (workspace/nrepl-port!)}}
                                    (workspace/cljs-repl-context!))}]
 
-    (.then (.sendRequest language-client "repl" (pr-str message))
+    (.then (.sendRequest language-client "eval" (pr-str message))
            (fn [result]
              (let [output-channel (get @*sys :output-channel)
                    out-str (str "\n" selected-text "\n=> " result "\n=> " (-> (edn/read-string result) :value first))]
                (out/append-line-and-show output-channel out-str)))))
 
   nil)
+
+
+(defn ^{:cmd "lightcode.newDocument"} new-document []
+  (vscode/workspace.openTextDocument (vscode/Uri.parse (str "untitled:" (.-rootPath vscode/workspace) "/.lightcode/doc.clj"))))
 
 
 ;; ------------------------------------------------
@@ -96,6 +100,9 @@
     (.start language-client)
 
     (register-disposable context language-client)
+
+    (->> (register-command  #'new-document)
+         (register-disposable context))
 
     (->> (register-text-editor-command  #'send-selection-to-repl)
          (register-disposable context))
