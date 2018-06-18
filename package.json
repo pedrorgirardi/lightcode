@@ -25,6 +25,11 @@
     ],
     "main": "./extension",
     "contributes": {
+        "configurationDefaults": {
+            "[clojure]": {
+                "editor.wordSeparators": "\t ()\"',;~@#$%^&{}[]`"
+            }
+        },
         "commands": [
             {
                 "title": "Send Selection to REPL",
