@@ -40,7 +40,7 @@
                                 (when (some done? messages)
                                   (remove-watch *messages id)
                                   ;; Reduce messages into a single map
-                                  ;; Easier to work with, right? :)
+                                  ;; (this is a very naive implementation)
                                   (callback (reduce merge {} messages))))))
 
     (.write socket bencoded "binary")
