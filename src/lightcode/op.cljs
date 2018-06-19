@@ -1,10 +1,4 @@
-(ns lightcode.op
-  (:require
-   [kitchen-async.promise :as p]
-
-   [lightcode.config :as config]
-   [lightcode.editor :as editor]
-   [lightcode.workspace :as workspace]))
+(ns lightcode.op)
 
 
 (defn ->info

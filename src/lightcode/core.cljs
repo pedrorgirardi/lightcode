@@ -5,7 +5,6 @@
    [cljs.reader :as edn]
 
    [lightcode.workspace :as workspace]
-   [lightcode.editor :as editor]
    [lightcode.document :as document]
    [lightcode.out :as out]
    [lightcode.op :as op]))
