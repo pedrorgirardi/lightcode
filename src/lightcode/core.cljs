@@ -64,7 +64,7 @@
         message         {:op      "eval"
                          :code    selected-text
                          :context (merge
-                                   {:env   (document/file-language-extension document)
+                                   {:env   (document/clojure-dialect document)
                                     :nrepl {:port (workspace/nrepl-port!)}}
                                    (workspace/cljs-repl-context!))}]
 

@@ -47,7 +47,7 @@
   (=  (.-languageId document) "clojure"))
 
 
-(defn file-language-extension [document]
+(defn clojure-dialect [document]
   (str/replace (file-extension document) #"\." ""))
 
 
