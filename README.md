@@ -1,3 +1,3 @@
 # Light Code
 
-Experimental Clojure & ClojureScript IDE.
+Smart completions, code navigation and refactoring for Clojure & ClojureScript.

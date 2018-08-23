@@ -1,7 +1,7 @@
 {
     "name": "lightcode",
     "displayName": "Light Code",
-    "description": "Experimental Clojure & ClojureScript IDE for VS Code",
+    "description": "Smart completions, code navigation and refactoring for Clojure & ClojureScript.",
     "version": "0.0.5-SNAPSHOT",
     "publisher": "pedrorgirardi",
     "author": {
