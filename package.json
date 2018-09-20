@@ -1,7 +1,7 @@
 {
     "name": "lightcode",
     "displayName": "Light Code",
-    "description": "Smart completions, code navigation and refactoring for Clojure & ClojureScript.",
+    "description": "Smart completions, code navigation and refactoring for Clojure & ClojureScript via Clojure LSP.",
     "version": "0.0.5-SNAPSHOT",
     "publisher": "pedrorgirardi",
     "author": {
@@ -24,25 +24,6 @@
         "onLanguage:clojure"
     ],
     "main": "./extension",
-    "contributes": {
-        "configurationDefaults": {
-            "[clojure]": {
-                "editor.wordSeparators": "\t ()\"',;~@#$%^&{}[]`"
-            }
-        },
-        "commands": [
-            {
-                "title": "Send Selection to REPL",
-                "category": "Light Code",
-                "command": "lightcode.sendSelectionToREPL"
-            },
-            {
-                "title": "New document",
-                "category": "Light Code",
-                "command": "lightcode.newDocument"
-            }
-        ]
-    },
     "scripts": {
         "clean": "rm -rf .shadow-cljs",
         "watch": "npx shadow-cljs watch :extension",
