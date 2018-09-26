@@ -23,6 +23,13 @@
     "activationEvents": [
         "onLanguage:clojure"
     ],
+    "contributes": {
+        "configurationDefaults": {
+            "[clojure]": {
+                "editor.wordSeparators": "()[]{}\\',;@$%^&|\"`~"
+            }
+        }
+    },
     "main": "./extension",
     "scripts": {
         "clean": "rm -rf .shadow-cljs",
